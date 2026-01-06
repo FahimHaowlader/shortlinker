@@ -46,10 +46,10 @@ const LoginPage = () => {
     <div className="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 min-h-screen flex flex-col items-center justify-center font-display antialiased p-4">
     
 
-      <main className="w-full max-w-[600px]">
+      <main className="w-full max-w-[500px]">
         <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-soft border border-slate-100 dark:border-gray-700 p-8 sm:p-10 transition-all">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-semibold text-slate-900 dark:text-white mb-2">Welcome back</h1>
+            <h1 className="text-3xl font-semibold text-slate-900 dark:text-white mb-2">Welcome back</h1>
             <p className="text-slate-500 dark:text-gray-400 text-sm">Enter your credentials to access your account</p>
           </div>
 
@@ -63,7 +63,7 @@ const LoginPage = () => {
             <div className="space-y-1">
               <label className="text-xs font-medium text-slate-600 dark:text-gray-400 uppercase tracking-wide ml-1">Email</label>
               <input 
-                className="form-input w-full rounded-xl border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-900 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/30 h-11 transition-colors text-sm" 
+                className="form-input w-full p-5 rounded-xl border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-900 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/30 h-11 transition-colors text-sm" 
                 placeholder="name@company.com" 
                 type="email" 
                 required
@@ -75,11 +75,11 @@ const LoginPage = () => {
             <div className="space-y-1">
               <div className="flex justify-between items-center ml-1">
                 <label className="text-xs font-medium text-slate-600 dark:text-gray-400 uppercase tracking-wide">Password</label>
-                <Link to="/forgot-password" size="xs" className="text-xs font-medium text-primary hover:text-primary-hover hover:underline transition-colors">Forgot password?</Link>
+                {/* <Link to="/forgot-password" size="xs" className="text-xs font-medium text-primary hover:text-primary-hover hover:underline transition-colors">Forgot password?</Link> */}
               </div>
               <div className="relative group">
                 <input 
-                  className="form-input w-full rounded-xl border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-900 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/30 h-11 transition-colors text-sm pr-10" 
+                  className="form-input w-full p-5 rounded-xl border-slate-200 dark:border-gray-600 bg-slate-50 dark:bg-gray-900 text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary/30 h-11 transition-colors text-sm pr-10" 
                   placeholder="••••••••" 
                   type={showPassword ? "text" : "password"} 
                   required
@@ -100,14 +100,14 @@ const LoginPage = () => {
 
             <button 
               disabled={btnLoading}
-              className="w-full mt-2 py-2.5 px-4 bg-primary hover:bg-primary-hover text-white text-sm font-semibold rounded-xl shadow-md shadow-primary/20 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed" 
+              className="w-full mt-2 py-2.5 px-4 bg-primary/80 hover:bg-primary text-white text-sm font-semibold rounded-xl shadow-md shadow-primary/20 transition-all active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed" 
               type="submit"
             >
               {btnLoading ? 'Signing In...' : 'Sign In'}
             </button>
           </form>
 
-          <div className="flex items-center gap-3 my-6">
+          <div className="flex items-center gap-3 my-4">
             <div className="h-px flex-1 bg-slate-100 dark:bg-gray-700"></div>
             <p className="text-slate-400 dark:text-gray-500 text-xs font-medium">OR</p>
             <div className="h-px flex-1 bg-slate-100 dark:bg-gray-700"></div>
@@ -129,8 +129,8 @@ const LoginPage = () => {
 
           <div className="mt-6 text-center">
             <p className="text-sm text-slate-500 dark:text-gray-400">
-              New to ShortLinkr? 
-              <Link to="/register" className="text-primary hover:text-primary-hover font-semibold transition-colors ml-1">Create account</Link>
+              New to ShortLinker? 
+              <Link to="/register" className="text-primary/80 hover:text-primary font-semibold transition-colors ml-1 ">Create account</Link>
             </p>
           </div>
         </div>
