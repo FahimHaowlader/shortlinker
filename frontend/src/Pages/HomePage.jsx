@@ -65,24 +65,33 @@ const HomePage = () => {
               </a>
             </nav>
 
+
             <div className="flex items-center gap-4">
               {user ? (
                 <div className="flex items-center gap-4">
-                  <span className="text-sm font-medium hidden sm:block text-slate-600 dark:text-slate-300">
+                  {/* <span className="text-sm font-medium hidden sm:block text-slate-600 dark:text-slate-300">
                     {user.displayName || user.email}
-                  </span>
-                  <button
+                  </span> */}
+                  <div className="flex items-center gap-6">
+            <nav className="hidden md:flex gap-8 text-sm font-medium text-slate-500 dark:text-slate-400">
+              <a className="hover:text-slate-900 dark:text-white transition-colors" href="#">Dashboard</a>
+              <a className="hidden lg:block hover:text-slate-900 dark:hover:text-white transition-colors" href="#">Analytics</a>
+              <a className="hidden lg:block hover:text-slate-900 dark:hover:text-white transition-colors" href="#">Settings</a>
+            </nav>
+            <div className="flex items-center gap-4 pl-6 sm:border-l border-slate-200 dark:border-slate-700">
+              <button
                     onClick={userSignOut}
-                    className="text-sm font-medium text-red-500 hover:text-red-600 transition-colors"
+                    className="text-sm cursor-pointer font-medium text-red-500 hover:text-red-600 transition-colors"
                   >
                     Log out
                   </button>
-                  <Link
-                    to="/dashboard"
-                    className="bg-primary text-white px-5 py-2.5 rounded-full text-sm font-semibold shadow-lg shadow-primary/20"
-                  >
-                    Dashboard
-                  </Link>
+              <div 
+                className="bg-center bg-no-repeat bg-cover rounded-full size-9 ring-2 ring-slate-100 dark:ring-slate-700 cursor-pointer" 
+                style={{ backgroundImage: `url(${user?.photoURL || 'https://lh3.googleusercontent.com/aida-public/AB6AXuChHIWtw-d_qGMDO7r6akX77_dtXTwle_wqqB0ptGkpwPSdbE_XG4mfekjMPT2Y9dOqFk5LuItBK-5wdlU2h0UArPt4GT0_Nu5IKtBrqhVuS3IqKLvdTPFnH9RtAqiP3j4qjgaD1NXJJA1wiW1n5eCIs8fg0MLNkLJ_JRzAtt6d3R54Eo8xPqjYfAqmCgJl7jNoOUX3m1aCwSWkf9OGOtCCLEmLSWKlhK8NkU5U1dsqacG6diZW-22pVcpYy8ZaV2YARyWtseF58g'})` }}
+              ></div>
+            </div>
+          </div>
+                  
                 </div>
               ) : (
                 <>
