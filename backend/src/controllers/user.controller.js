@@ -9,22 +9,15 @@ import  User  from "../models/user.model.js";
 
 const createUser = asyncHandler(async (req, res) => {
   try {
-    const {role :adminRole }  = req.user;
-    // console.log("Admin Role:", adminRole  );
-    // Only admin can create users
-    if (adminRole !== "admin") {
-      throw new apiError(403, "Only admin can create users");
-    }
     const {user} = req.body;
-    const { userId, password,role } = user;
+    const { mail } = user;
 
-    // Validate required fields
-    if (!userId || !password || !role)  {
+    if (!mail)  {
       throw new apiError(400, "Please provide all required fields");
     }
 
     // Check if user already exists
-    const existingUser = await User.findOne({ userId });
+    const existingUser = await User.findOne({ mail });
     if (existingUser) {
       throw new apiError(409, "User with this userId already exists");
     }
@@ -41,31 +34,21 @@ const createUser = asyncHandler(async (req, res) => {
 });
 
 const userLogin = asyncHandler(async (req, res) => {
-  const { userId, password } = req.body;
+  const { mail } = req.body;
   // console.log("Login attempt for userId:", userId);
   // console.log("Request body:", req.body);
 
   // Validate required fields
-  if (!userId || !password) {
-    throw new apiError(400, "Please provide userId and password");
+  if (!mail) {
+    throw new apiError(400, "Please provide mail");
   }
 
-  // Find user by userId
-  const user = await User.findOne({ userId }).select("+password");
+  // Find user by mail
+  const user = await User.findOne({ mail })
   if (!user) {
-    throw new apiError(401, "Invalid userId or password");
+    throw new apiError(401, "Invalid mail");
   }
-  // console.log("User found:", user);
-  // Check if user has access
-  if (!user.access) {
-    throw new apiError(403, "Your account does not have access");
-  }
-
-  // Check password
-  const isPasswordValid = await user.isPasswordCorrect(password);
-  if (!isPasswordValid) {
-    throw new apiError(401, "Invalid userId or password");
-  }
+  
 
   // Generate access token
   const accessToken = user.generateAccessToken();
@@ -80,9 +63,8 @@ const userLogin = asyncHandler(async (req, res) => {
 
   // Optional: return minimal user info
   const userInfo = {
-    userId: user.userId,
-    role: user.role,
-    access: user.access,
+    mail: user.mail,
+    credits: user.credits,
   };
 
   res.status(200).json(

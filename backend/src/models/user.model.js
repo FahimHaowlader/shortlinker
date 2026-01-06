@@ -15,30 +15,27 @@ const userSchema = new mongoose.Schema({
   shortLinks: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "shortLink",
+      ref: "ShortLink",
     },
   ],
 
 }, { timestamps: true });
 
-// Methods for plain text password
-userSchema.methods.isPasswordCorrect = function (password) {
-  return password === this.password;
-};
+
 
 userSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
       _id: this._id,
-      userId: this.userId,
-      role: this.role,
+      mail: this.mail,
+      credits: this.credits, 
     },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
   );
 };
 
-// Create model AFTER adding methods
+
 const User = mongoose.model("User", userSchema);
 
 export default User;
