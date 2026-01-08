@@ -56,7 +56,6 @@ const handleGoogleLogin = async () => {
       const res = await axios.post("http://localhost:5200/api/v1/login", {
         mail: email,
       });
-      console.log("Existing user logged in via Google:", res.data);
     } catch (err) {
       // If user does NOT exist → create new user
       if (err.response?.status === 404) {

@@ -1,34 +1,93 @@
 import React, { useState } from "react";
-import { Link } from "react-router";
+import { Link,useNavigate } from "react-router";
 import { useAuth } from "../Contexts/AuthContext";
 import ReviewCard from "../Components/ReviewCard";
 import StatItem from "../Components/StatItem";
 import Pricing from "../Components/Pricing";
 import FeatureCard from "../Components/FeatureCard";
 import Step from "../Components/Step";
+import { useEffect } from "react";
+import axios from "axios";
 
 const HomePage = () => {
+  const [limit ,setLimit] = useState(0);
   const { user, userSignOut } = useAuth();
   const [longUrl, setLongUrl] = useState("");
   const [shortenedUrl, setShortenedUrl] = useState("");
   const [isShortening, setIsShortening] = useState(false);
+  const navigate = useNavigate();
+  const [copied, setCopied] = useState(false);
+
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (user) {
+           const response = await axios.post(`http://localhost:5200/api/v1/login`, {
+        mail: user.email,
+      });
+      console.log("Login response:", response.data);
+      setLimit(response.data.data.user.credits);
+        // console.log("User is logged in on HomePage:", user);
+      } else {
+        console.log("No user is logged in on HomePage");
+      }
+    };
+
+    fetchUserData();  
+  }, [user]);
 
   const handleShorten = async (e) => {
     e.preventDefault();
+    if(!user){
+      navigate("/login");
+      return;
+    }
+    if (!limit){
+      alert("You have reached your link creation limit. Please upgrade your plan to create more links.");
+      return;
+    }
     if (!longUrl) return;
 
     setIsShortening(true);
     // Simulate an API call delay
-    setTimeout(() => {
-      setShortenedUrl(`shrt.url/${Math.random().toString(36).substring(7)}`);
+    
+    try {  
+        const shortCode = Math.random().toString(36).substring(7);
+      setShortenedUrl(`localhost:5200/api/v1/url/${shortCode}`);
+      const response = await axios.post(`http://localhost:5200/api/v1/update-user`, { 
+        mail: user.email,
+      });
+      setLimit(response.data.data?.credits);
+      console.log("User credits after shortening:", response.data.data?.credits);
+      const res = await axios.post("http://localhost:5200/api/v1/links", {  
+        originalUrl: longUrl,
+        shortCode: shortCode,
+        mail: user.email,
+      });
       setIsShortening(false);
-    }, 1000);
+    } catch (err) {
+      console.error("Error shortening URL:", err);
+      setIsShortening(false);
+    }
   };
+ 
+const copyToClipboard = async () => {
+  console.log("Attempting to copy:", shortenedUrl);
+  if (!shortenedUrl) return;
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(shortenedUrl);
-    alert("Copied to clipboard!");
-  };
+  try {
+    // Copy full URL including https://
+    await navigator.clipboard.writeText(`https://${shortenedUrl}`);
+    setCopied(true);
+
+    // Reset copied state after 1.5s for button feedback
+    setTimeout(() => setCopied(false), 1500);
+  } catch (err) {
+    console.error("Copy failed:", err);
+    alert("Failed to copy. Please copy manually.");
+  }
+};
+
 
   return (
     <div className="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-100 font-display antialiased selection:bg-primary/20 selection:text-primary">
@@ -138,66 +197,84 @@ const HomePage = () => {
               performance. Join thousands of marketers creating millions of
               links each month.
             </p>
+              <div className="flex flex-col md:flex-row items-center gap-4 bg-white dark:bg-surface-dark px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm mb-10">
+                <div className="flex md:flex-col gap-5 md:gap-0 items-center">
+                  <span className="text-sm font-bold text-slate-900 dark:text-white">{100 -(limit) 
+                    } <span className="text-slate-400 font-normal">/ 100 links</span></span>
+                </div>
+                 <div className="flex flex-col md:flex-row  gap-5 md:gap-2 items-center">
 
-            <div className="w-full max-w-2xl mx-auto relative group z-10">
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-              <form
-                onSubmit={handleShorten}
-                className="relative bg-white dark:bg-surface-dark p-2 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700/50 flex flex-col sm:flex-row items-center gap-2"
+                
+                <div className="w-24 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                  <div className="h-full bg-primary rounded-full" style={{ width: `${100 -(limit)}%` }}></div>
+                </div>
+                <a href="#pricing"> 
+                <button className="ml-2 cursor-pointer text-xs font-medium text-primary hover:text-primary-dark whitespace-nowrap">Upgrade</button></a>
+              </div>
+               </div>
+<div className="w-full max-w-2xl relative group">
+
+          {/* FIXED overlay */}
+          <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-purple-400 
+          rounded-2xl blur opacity-20 group-hover:opacity-40 transition pointer-events-none"></div>
+
+          <form
+    onSubmit={handleShorten}
+    className="relative bg-white dark:bg-surface-dark p-2 rounded-2xl shadow-xl border border-slate-100 dark:border-slate-700/50 flex flex-col sm:flex-row items-center gap-2"
+  >
+    <div className="relative flex-1 w-full">
+      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+        <span className="material-symbols-outlined text-slate-400">
+          link
+        </span>
+      </div>
+      <input
+        className="block w-full pl-12 pr-4 py-4 bg-transparent border-none rounded-xl text-lg text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-0 focus:outline-none"
+        placeholder="Paste your long link here..."
+        type="url"
+        required
+        value={longUrl}
+        onChange={(e) => setLongUrl(e.target.value)}
+      />
+    </div>
+    <button
+      disabled={isShortening}
+      className="w-full sm:w-auto px-8 py-4 bg-primary hover:bg-primary-dark text-white rounded-xl font-semibold shadow-glow transition-all flex items-center justify-center gap-2 group/btn disabled:opacity-70"
+    >
+      <span>{isShortening ? "Processing..." : "Shorten URL"}</span>
+      <span className="material-symbols-outlined text-sm group-hover/btn:translate-x-1 transition-transform">
+        arrow_forward
+      </span>
+    </button>
+  </form>
+
+          {shortenedUrl && (
+           <div className="mt-6 animate-in fade-in slide-in-from-top-4 duration-500 bg-white dark:bg-surface-dark rounded-xl border border-slate-100 dark:border-slate-800 p-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div className="flex flex-col text-left overflow-hidden w-full">
+        <span className="text-xs text-slate-500 mb-1">Your short link</span>
+        <a
+          className="text-primary font-medium hover:underline truncate"
+          href={`http://${shortenedUrl}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {shortenedUrl}
+        </a>
+      </div>
+
+              {/* FIXED BUTTON */}
+              <button
+                type="button"
+                onClick={copyToClipboard}
+                className="ml-4 px-4 py-2 text-sm bg-slate-100 hover:bg-slate-200 
+                rounded-lg cursor-pointer"
               >
-                <div className="relative flex-1 w-full">
-                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <span className="material-symbols-outlined text-slate-400">
-                      link
-                    </span>
-                  </div>
-                  <input
-                    className="block w-full pl-12 pr-4 py-4 bg-transparent border-none rounded-xl text-lg text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-0 focus:outline-none"
-                    placeholder="Paste your long link here..."
-                    type="url"
-                    required
-                    value={longUrl}
-                    onChange={(e) => setLongUrl(e.target.value)}
-                  />
-                </div>
-                <button
-                  disabled={isShortening}
-                  className="w-full sm:w-auto px-8 py-4 bg-primary hover:bg-primary-dark text-white rounded-xl font-semibold shadow-glow transition-all flex items-center justify-center gap-2 group/btn disabled:opacity-70"
-                >
-                  <span>{isShortening ? "Processing..." : "Shorten URL"}</span>
-                  <span className="material-symbols-outlined text-sm group-hover/btn:translate-x-1 transition-transform">
-                    arrow_forward
-                  </span>
-                </button>
-              </form>
-
-              {shortenedUrl && (
-                <div className="mt-6 animate-in fade-in slide-in-from-top-4 duration-500 bg-white dark:bg-surface-dark rounded-xl border border-slate-100 dark:border-slate-800 p-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
-                  <div className="flex flex-col text-left overflow-hidden w-full">
-                    <span className="text-xs text-slate-500 mb-1">
-                      Your short link
-                    </span>
-                    <a
-                      className="text-primary font-medium hover:underline truncate"
-                      href={`https://${shortenedUrl}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {shortenedUrl}
-                    </a>
-                  </div>
-                  <div className="flex gap-2 w-full sm:w-auto">
-                    <button
-                      onClick={copyToClipboard}
-                      className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium text-slate-600 bg-slate-50 hover:bg-slate-100 rounded-lg border border-slate-200 transition-colors"
-                    >
-                      Copy
-                    </button>
-
-                  </div>
-                </div>
-              )}
+                {copied ? "Copied!" : "Copy"}
+              </button>
             </div>
+          )}
+        </div>
+
 
             <p className="mt-6 text-sm text-slate-400 dark:text-slate-500">
               By clicking Shorten URL, you agree to our{" "}
@@ -363,25 +440,117 @@ const HomePage = () => {
   );
 };
 
-// const FeatureCard = ({ icon, title, desc, iconBg, iconColor }) => (
-//   <div className="bg-white dark:bg-surface-dark p-8 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-md transition-shadow">
-//     <div className={`size-12 ${iconBg} ${iconColor} rounded-2xl flex items-center justify-center mb-6`}>
-//       <span className="material-symbols-outlined text-2xl">{icon}</span>
-//     </div>
-//     <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{title}</h3>
-//     <p className="text-slate-500 dark:text-slate-400 leading-relaxed">{desc}</p>
-//   </div>
-// );
 
-// const Step = ({ icon, number, title, desc }) => (
-//   <div className="flex flex-col items-center text-center group">
-//     <div className="w-16 h-16 bg-white dark:bg-surface-dark rounded-2xl shadow-soft border border-slate-100 dark:border-slate-800 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 relative">
-//       <span className="absolute -top-3 -right-3 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-bold text-sm shadow-lg border-2 border-white dark:border-surface-dark">{number}</span>
-//       <span className="material-symbols-outlined text-3xl text-primary">{icon}</span>
-//     </div>
-//     <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">{title}</h3>
-//     <p className="text-slate-500 dark:text-slate-400 text-sm leading-relaxed max-w-xs">{desc}</p>
-//   </div>
-// );
 
 export default HomePage;
+
+const HomePage1 = () => {
+  const [limit, setLimit] = useState(0);
+  const { user, userSignOut } = useAuth();
+  const [longUrl, setLongUrl] = useState("");
+  const [shortenedUrl, setShortenedUrl] = useState("");
+  const [isShortening, setIsShortening] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (!user) return;
+      const response = await axios.post("http://localhost:5200/api/v1/login", {
+        mail: user.email,
+      });
+      setLimit(response.data.data.user.credits);
+    };
+    fetchUserData();
+  }, [user]);
+
+  const handleShorten = (e) => {
+    e.preventDefault();
+
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    if (!limit) {
+      alert("You have reached your link creation limit.");
+      return;
+    }
+
+    setIsShortening(true);
+    setTimeout(() => {
+      setShortenedUrl(`shrt.url/${Math.random().toString(36).substring(7)}`);
+      setIsShortening(false);
+    }, 300);
+  };
+
+  const copyToClipboard = async () => {
+    if (!shortenedUrl) return;
+    try {
+      await navigator.clipboard.writeText(`https://${shortenedUrl}`);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch (err) {
+      alert("Copy failed");
+    }
+  };
+
+  return (
+    <div className="bg-background-light dark:bg-background-dark min-h-screen">
+      <main className="pt-32 flex justify-center">
+        <div className="w-full max-w-2xl relative group">
+
+          {/* FIXED overlay */}
+          <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-purple-400 
+          rounded-2xl blur opacity-20 group-hover:opacity-40 transition pointer-events-none"></div>
+
+          <form
+            onSubmit={handleShorten}
+            className="relative bg-white dark:bg-surface-dark p-3 rounded-2xl shadow-xl flex gap-2"
+          >
+            <input
+              type="url"
+              required
+              value={longUrl}
+              onChange={(e) => setLongUrl(e.target.value)}
+              placeholder="Paste your long link here..."
+              className="flex-1 px-4 py-3 rounded-xl border outline-none"
+            />
+
+            <button
+              type="submit"
+              disabled={isShortening}
+              className="px-6 py-3 bg-primary text-white rounded-xl"
+            >
+              {isShortening ? "Processing..." : "Shorten"}
+            </button>
+          </form>
+
+          {shortenedUrl && (
+            <div className="mt-6 bg-white dark:bg-surface-dark rounded-xl p-4 flex items-center justify-between">
+              <a
+                href={`https://${shortenedUrl}`}
+                target="_blank"
+                rel="noreferrer"
+                className="text-primary truncate"
+              >
+                {shortenedUrl}
+              </a>
+
+              {/* FIXED BUTTON */}
+              <button
+                type="button"
+                onClick={copyToClipboard}
+                className="ml-4 px-4 py-2 text-sm bg-slate-100 hover:bg-slate-200 
+                rounded-lg cursor-pointer"
+              >
+                {copied ? "Copied!" : "Copy"}
+              </button>
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
+  );
+};
+
