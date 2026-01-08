@@ -45,29 +45,22 @@ export const AuthContext = ({children}) => {
     return signOut(auth);
   };
 
-  useEffect(() => {
-    const userStatus = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        axios.get(`https://book-courier-backend-six.vercel.app/users/${user.email}`)
-        .then((res) => {
-          // console.log("Fetched user from DB:", res.data);
-          user.role =  res.data.role; // Assign role to user object
-          setUser(user);
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error fetching user data:", error);
-          setUser(user); // Set user even if role fetch fails
-          setLoading(false);
-        });
-  
-      } else {
-        setUser(null);
-        setLoading(false);
-      }
-    });
-      return () => userStatus();
-  }, []);
+useEffect(() => {
+  const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    setLoading(true);
+    if (user) {
+      setUser(user);
+    } else {
+      setUser(null);
+    }
+
+    setLoading(false);
+  });
+
+  return unsubscribe;
+}, []);
+
+
   const authInfo = {
     user,
     setUser,

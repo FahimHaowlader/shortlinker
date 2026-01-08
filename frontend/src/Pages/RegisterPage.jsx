@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../Contexts/AuthContext';
 import { useNavigate, Link } from 'react-router';
+import axios from 'axios';
 
 const RegisterPage = () => {
   const { createEmailUser, userInfoUpdate, googleUser } = useAuth();
@@ -25,31 +26,52 @@ const RegisterPage = () => {
     setError('');
     setLoading(true);
 
-    try {
-      
-      await createEmailUser(email, password);
-      
-  
-      await userInfoUpdate({ displayName: username });
-      
-      console.log("Account created successfully!");
-      navigate('/'); 
-    } catch (err) {
-      if (err.code === 'auth/email-already-in-use') {
-        setError('This email is already in use.');
-      } else {
-        setError(err.message || 'Failed to create account.');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+try {
+  await createEmailUser(email, password);
+  await userInfoUpdate({ displayName: username });
+  console.log("User created in Firebase:", email);
+  // Backend sync (non-blocking for UX)
+  try {
+   const res =  await axios.post("http://localhost:5200/api/v1/register", {
+      mail: email,
+    });
+    console.log("Backend registration response:", res.data);
+  } catch (apiErr) {
+    console.warn(
+      "User created in Firebase but backend sync failed:",
+      apiErr.response?.data
+    );
+  }
+
+  navigate("/");
+} catch (err) {
+  if (err.code === "auth/email-already-in-use") {
+    setError("This email is already in use.");
+  } else {
+    setError(err.message || "Failed to create account.");
+  }
+} finally {
+  setLoading(false);
+  }};
 
   const handleGoogleSignUp = async () => {
     setError('');
     try {
-      await googleUser();
-      navigate('/');
+     const res =  await googleUser();
+      console.log("Google sign-up user:", res.user);
+      const email = res.user.email;
+      try {
+       const response =  await axios.post(`http://localhost:5200/api/v1/register`, { mail: email });// Register if not exists
+        console.log("Google sign-up response:", response.data);
+        navigate('/');
+      } catch (regErr) {
+        if(regErr.response && regErr.response.status === 409){
+          // User already exists, proceed to home
+          navigate('/');
+          return;
+        }
+        console.error("Google sign-up registration error:", regErr);
+      }
     } catch (err) {
       setError('Google sign-up failed. Please try again.');
     }

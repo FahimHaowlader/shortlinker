@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../Contexts/AuthContext';// Adjust path to your context file
 import { useNavigate, Link } from 'react-router';
+import axios from 'axios';
 
 const LoginPage = () => {
   const { emailUserSignIn, googleUser } = useAuth();
@@ -19,6 +20,9 @@ const LoginPage = () => {
     
     try {
       await emailUserSignIn(email, password);
+      const response = await axios.post(`http://localhost:5200/api/v1/login`, { mail: email });
+      console.log("Login response:", response.data);
+      
       navigate('/'); // Redirect to home/dashboard on success
     } catch (err) {
       // Map Firebase error codes to user-friendly messages
@@ -36,6 +40,11 @@ const LoginPage = () => {
     setError('');
     try {
       await googleUser();
+      const response = await axios.post(`http://localhost:5200/api/v1/login`, { mail: email });
+      // console.log("Google login response:", response.data);
+      if (!response.data.mail) {
+        await axios.post(`http://localhost:5200/api/v1/register`, { mail: email });// Register if not exists
+      }
       navigate('/');
     } catch (err) {
       setError('Google sign-in failed. Please try again.');
