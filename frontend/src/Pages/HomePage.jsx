@@ -24,11 +24,11 @@ const HomePage = () => {
            const response = await axios.post(`http://localhost:5200/api/v1/login`, {
         mail: user.email,
       });
-      console.log("Login response:", response.data);
+      // console.log("Login response:", response.data);
       setLimit(response.data.data.user.credits);
         // console.log("User is logged in on HomePage:", user);
       } else {
-        console.log("No user is logged in on HomePage");
+        // console.log("No user is logged in on HomePage");
       }
     };
 
@@ -57,7 +57,7 @@ const HomePage = () => {
         mail: user.email,
       });
       setLimit(response.data.data?.credits);
-      console.log("User credits after shortening:", response.data.data?.credits);
+      // console.log("User credits after shortening:", response.data.data?.credits);
       const res = await axios.post("http://localhost:5200/api/v1/links", {  
         originalUrl: longUrl,
         shortCode: shortCode,
@@ -71,7 +71,7 @@ const HomePage = () => {
   };
  
 const copyToClipboard = async () => {
-  console.log("Attempting to copy:", shortenedUrl);
+  // console.log("Attempting to copy:", shortenedUrl);
   if (!shortenedUrl) return;
 
   try {

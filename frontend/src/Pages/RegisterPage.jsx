@@ -29,13 +29,13 @@ const RegisterPage = () => {
 try {
   await createEmailUser(email, password);
   await userInfoUpdate({ displayName: username });
-  console.log("User created in Firebase:", email);
+  // console.log("User created in Firebase:", email);
   // Backend sync (non-blocking for UX)
   try {
    const res =  await axios.post("http://localhost:5200/api/v1/register", {
       mail: email,
     });
-    console.log("Backend registration response:", res.data);
+    // console.log("Backend registration response:", res.data);
   } catch (apiErr) {
     console.warn(
       "User created in Firebase but backend sync failed:",
@@ -58,11 +58,11 @@ try {
     setError('');
     try {
      const res =  await googleUser();
-      console.log("Google sign-up user:", res.user);
+      // console.log("Google sign-up user:", res.user);
       const email = res.user.email;
       try {
        const response =  await axios.post(`http://localhost:5200/api/v1/register`, { mail: email });// Register if not exists
-        console.log("Google sign-up response:", response.data);
+        // console.log("Google sign-up response:", response.data);
         navigate('/');
       } catch (regErr) {
         if(regErr.response && regErr.response.status === 409){

@@ -23,7 +23,7 @@ const LoginPage = () => {
       const response = await axios.post(`http://localhost:5200/api/v1/login`, {
         mail: email,
       });
-      console.log("Login response:", response.data);
+      // console.log("Login response:", response.data);
 
       navigate("/"); // Redirect to home/dashboard on success
     } catch (err) {
@@ -45,7 +45,7 @@ const handleGoogleLogin = async () => {
     // Google authentication
     const result = await googleUser();
     const email = result?.user?.email;
-    console.log("Google sign-in email:", email);
+    // console.log("Google sign-in email:", email);
 
     if (!email) {
       throw new Error("Email not found from Google");
@@ -62,7 +62,7 @@ const handleGoogleLogin = async () => {
           const res = await axios.post("http://localhost:5200/api/v1/register", {
           mail: email,
         });
-        console.log("New user registered via Google:", res.data);
+        // console.log("New user registered via Google:", res.data);
       }
     }
 
