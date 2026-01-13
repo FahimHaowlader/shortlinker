@@ -1,7 +1,8 @@
+import dotenv from "dotenv";
+dotenv.config();
 import app from "./app.js";
-import mongoose from "mongoose";
 import connectDB from "./db.js";
-import router from "./route.js"; // your route.js with /api/v1 endpoints
+
 
 
 connectDB()

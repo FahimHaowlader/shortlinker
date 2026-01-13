@@ -1,12 +1,12 @@
-import apiError from "../utils/apiError";
+import apiError from "../utils/apiError.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import apiResponse from "../utils/apiResponse.js";
 import ShortLink from "../models/shortLink.model.js";
 
 export const createShortLink = asyncHandler(async (req, res) => {
-  const { originalUrl, shortCode } = req.body;
+  const { originalUrl, shortCode ,mail } = req.body;
 
-  if (!originalUrl || !shortCode) {
+  if (!originalUrl || !shortCode || !mail) {
     throw new apiError(400, "Please provide all required fields");
   }
 
@@ -15,7 +15,7 @@ export const createShortLink = asyncHandler(async (req, res) => {
     throw new apiError(409, "Short code already in use");
   }
 
-  const newShortLink = new ShortLink({ originalUrl, shortCode });
+  const newShortLink = new ShortLink({ originalUrl, shortCode,owner:mail });
   await newShortLink.save();
 
   res.status(201).json(new apiResponse(201, newShortLink, "Short link created successfully"));
@@ -48,9 +48,11 @@ export const deleteShortLink = asyncHandler(async (req, res) => {
   res.status(200).json(new apiResponse(200, null, "Short link deleted successfully"));
 });
 export const getAllShortLinks = asyncHandler(async (req, res) => {
-    const { id,page } = req.body;
+   const { mail,page } = req.body;
     const limit = 10;
     const skip = (page - 1) * limit;
-  const shortLinks = await ShortLink.find({ owner: id }).skip(skip).limit(limit);
-  res.status(200).json(new apiResponse(200, shortLinks, "Short links retrieved successfully"));
+    const totalLinks = await ShortLink.countDocuments({ owner:mail });
+  const shortLinks = await ShortLink.find({ owner:mail }).skip(skip).limit(limit).exec();
+  res.status(200).json(new apiResponse(200, {shortLinks,totalLinks}, "Short links retrieved successfully"));
 });
+

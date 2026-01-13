@@ -8,29 +8,25 @@ import apiResponse from "../utils/apiResponse.js";
 import  User  from "../models/user.model.js";
 
 const createUser = asyncHandler(async (req, res) => {
-  try {
-    const {user} = req.body;
-    const { mail } = user;
+  const { mail } = req.body;
 
-    if (!mail)  {
-      throw new apiError(400, "Please provide all required fields");
-    }
-
-    // Check if user already exists
-    const existingUser = await User.findOne({ mail });
-    if (existingUser) {
-      throw new apiError(409, "User with this userId already exists");
-    }
-
-    // Create new user
-    const newUser = new User(user)
-    await newUser.save();
-
-    res.status(201).json(new apiResponse(201, newUser, "User created successfully"));
-  } catch (error) {
-    console.error("Create User Error:", error);
-    res.status(500).json({ message: "Internal server error" });
+  if (!mail) {
+    throw new apiError(400, "Please provide mail");
   }
+
+  const existingUser = await User.findOne({ mail });
+
+  if (existingUser) {  
+    return res
+      .status(200)
+      .json(new apiResponse(200, existingUser, "User already exists"));
+  }
+
+  const newUser = await User.create({ mail });
+
+  res
+    .status(201)
+    .json(new apiResponse(201, newUser, "User created successfully"));
 });
 
 const userLogin = asyncHandler(async (req, res) => {
@@ -46,34 +42,40 @@ const userLogin = asyncHandler(async (req, res) => {
   // Find user by mail
   const user = await User.findOne({ mail })
   if (!user) {
-    throw new apiError(401, "Invalid mail");
+    throw new apiError(404, "Invalid mail");
   }
   
 
-  // Generate access token
-  const accessToken = user.generateAccessToken();
 
-  // Set token in secure HTTP-only cookie
-  res.cookie("accessToken", accessToken, {
-    httpOnly: true,      // Cannot be accessed by JS (prevents XSS)
-    secure: process.env.NODE_ENV === "production", // Only HTTPS in prod
-    sameSite: "Strict",  // CSRF protection
-    maxAge: 1000 * 60 * 60 * 24 * 2, // 2 day in milliseconds
-  });
-
-  // Optional: return minimal user info
-  const userInfo = {
-    mail: user.mail,
-    credits: user.credits,
-  };
 
   res.status(200).json(
     new apiResponse(
       200,
-      { user: userInfo },
+      { user },
       "User logged in successfully"
     )
   );
+});
+const updateUser = asyncHandler(async (req, res) => {
+  const { mail } = req.body;
+
+  if (!mail) {
+    throw new apiError(400, "Please provide required fields");
+  }
+
+  const user = await User.findOneAndUpdate(
+    { mail },
+    { $inc: { credits: -1 } }, // ✅ DECREASE credits by 1
+    { new: true }
+  );
+
+  if (!user) {
+    throw new apiError(404, "User not found");
+  }
+
+  res
+    .status(200)
+    .json(new apiResponse(200, user, "Credits decreased successfully"));
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
@@ -85,9 +87,16 @@ const logoutUser = asyncHandler(async (req, res) => {
 
 const verifyToken = asyncHandler(async (req, res) => {
   const user = req.user;
-  res.status(200).json(new apiResponse(200, { user }, "Token is valid"));
+  console.log("Verifying token for user:", user);
+  const userData = await User.findById(user._id);
+
+  if (!userData) {
+    throw new apiError(404, "User not found");
+  }
+
+  res.status(200).json(new apiResponse(200, { user : userData }, "Token is valid"));
 });
 
 
 
-export { createUser,  userLogin, verifyToken , logoutUser};
+export { createUser,  userLogin, verifyToken , logoutUser,updateUser};

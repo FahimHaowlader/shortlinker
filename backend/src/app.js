@@ -6,32 +6,35 @@ import router from "./route.js";
 
 const app = express();
 
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
-}));
+// app.use(helmet({
+//   crossOriginResourcePolicy: { policy: "cross-origin" }
+// }));
 
 const allowedOrigins = [
   process.env.CLIENT_URL_PROD,
   process.env.CLIENT_URL_DEV, // Hardcode this temporarily to test
 ].filter(Boolean); // This removes any 'undefined' values from the array
 
-app.use(cors({
-  origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl)
-    if (!origin) return callback(null, true);
+// app.use(cors({
+//   origin: function (origin, callback) {
+//     // Allow requests with no origin (like mobile apps or curl)
+//     if (!origin) return callback(null, true);
     
-    if (allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.log("Blocked by CORS. Origin was:", origin);
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  credentials: true,
-  optionsSuccessStatus: 200
+//     if (allowedOrigins.includes(origin)) {
+//       callback(null, true);
+//     } else {
+//       console.log("Blocked by CORS. Origin was:", origin);
+//       callback(new Error("Not allowed by CORS"));
+//     }
+//   },
+//   credentials: true,
+//   optionsSuccessStatus: 200
+// }));
+
+app.use(cors({
+  origin: "http://localhost:5173", // frontend origin
+  credentials: true,               // allow cookies
 }));
-
-
 
 app.use(express.json({ limit: '1mb' })); // Parse JSON request bodies
 
@@ -52,21 +55,21 @@ app.use(express.static('public'));
 
 
 // This MUST be the last middleware in your app.js
-app.use((err, req, res, next) => {
-    // If the error is an instance of your apiError, use its statusCode
-    // Otherwise, default to 500 (Internal Server Error)
-    const statusCode = err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
+// app.use((err, req, res, next) => {
+//     // If the error is an instance of your apiError, use its statusCode
+//     // Otherwise, default to 500 (Internal Server Error)
+//     const statusCode = err.statusCode || 500;
+//     const message = err.message || "Internal Server Error";
 
-    console.error(`[ERROR] ${statusCode} - ${message}`);
+//     console.error(`[ERROR] ${statusCode} - ${message}`);
 
-    res.status(statusCode).json({
-        success: false,
-        statusCode,
-        message,
-        errors: err.errors || []
-    });
-});
+//     res.status(statusCode).json({
+//         success: false,
+//         statusCode,
+//         message,
+//         errors: err.errors || []
+//     });
+// });
 
 // 5. ROUTES
 app.get('/', (req, res) => {

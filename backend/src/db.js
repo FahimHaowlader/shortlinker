@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 
 
+
  const connectDB = async () => {
     try {
         const connectionInstance = await mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_CLUSTER}/${process.env.DATABASE_NAME}?retryWrites=true&w=majority&appName=Cluster0`)
