@@ -185,6 +185,7 @@ const DashboardPage = () => {
                     >
                       Log out
                     </button>
+                    <Link to={`/dashboard/${user?.email}`}>
                     <div
                       className="bg-center bg-no-repeat bg-cover rounded-full size-9 ring-2 ring-slate-100 dark:ring-slate-700 cursor-pointer"
                       style={{
@@ -193,7 +194,10 @@ const DashboardPage = () => {
                           "https://lh3.googleusercontent.com/aida-public/AB6AXuChHIWtw-d_qGMDO7r6akX77_dtXTwle_wqqB0ptGkpwPSdbE_XG4mfekjMPT2Y9dOqFk5LuItBK-5wdlU2h0UArPt4GT0_Nu5IKtBrqhVuS3IqKLvdTPFnH9RtAqiP3j4qjgaD1NXJJA1wiW1n5eCIs8fg0MLNkLJ_JRzAtt6d3R54Eo8xPqjYfAqmCgJl7jNoOUX3m1aCwSWkf9OGOtCCLEmLSWKlhK8NkU5U1dsqacG6diZW-22pVcpYy8ZaV2YARyWtseF58g"
                         })`,
                       }}
-                    ></div>
+                    > 
+                    {/* <img src={user?.photoURL || "https://lh3.googleusercontent.com/aida-public/AB6AXuChHIWtw-d_qGMDO7r6akX77_dtXTwle_wqqB0ptGkpwPSdbE_XG4mfekjMPT2Y9dOqFk5LuItBK-5wdlU2h0UArPt4GT0_Nu5IKtBrqhVuS3IqKLvdTPFnH9RtAqiP3j4qjgaD1NXJJA1wiW1n5eCIs8fg0MLNkLJ_JRzAtt6d3R54Eo8xPqjYfAqmCgJl7jNoOUX3m1aCwSWkf9OGOtCCLEmLSWKlhK8NkU5U1dsqacG6diZW-22pVcpYy8ZaV2YARyWtseF58g"} alt="" /> */}
+                    </div>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -241,7 +245,7 @@ const DashboardPage = () => {
                   </span>
                 </span>
               </div>
-              <div className="flex flex-col md:flex-row  gap-5 md:gap-2 items-center">
+              <div className="flex  gap-5 md:gap-2 items-center">
                 <div className="w-24 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-primary rounded-full"

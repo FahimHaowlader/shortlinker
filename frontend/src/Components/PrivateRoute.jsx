@@ -1,19 +1,20 @@
 
 import { Navigate, useLocation } from 'react-router';
-import { useAuth } from '../Context/Auth.Context.jsx';
-import GeneralShkeleton from '../Components/GeneralSkeleton';
+import { useAuth } from '../Contexts/AuthContext';
+import LoadingSpiner from './LoadingSpiner.jsx';
+
+import { useEffect } from 'react';
 
 const PrivateRoute = ({ children }) => {
-  const { user, loading, checkSession } = useAuth();
+  const { user, loading, } = useAuth();
   const location = useLocation();
 
   // This ensures that every time the route changes, 
   // we silently verify the cookie with the backend
   useEffect(() => {
-    checkSession();
   }, [location.pathname]); 
 
-  if (loading) return <GeneralShkeleton />;
+  if (loading) return <LoadingSpiner />;
 
   if (!user) {
     return (

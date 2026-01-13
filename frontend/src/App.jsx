@@ -2,6 +2,9 @@ import { Navigate } from 'react-router'
 import { createBrowserRouter,RouterProvider } from 'react-router'
 import './App.css'
 
+
+import PrivateRoute from './Components/PrivateRoute.jsx'
+
 // Importing Pages
 import HomePage from './Pages/HomePage.jsx'
 import LoginPage from './Pages/LoginPage.jsx'
@@ -30,7 +33,7 @@ function App() {
       children: [
         {
           path:'/dashboard/:id',
-          Component: DashboardPage
+          element: <PrivateRoute> <DashboardPage/></PrivateRoute>
         }
       ]
     }
