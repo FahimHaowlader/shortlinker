@@ -16,6 +16,7 @@ const context = createContext();
 export const useAuth = () => useContext(context);
 
 export const AuthContext = ({children}) => {
+ const[limit, setLimit] = useState(0);
  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [adminLoading, setAdminLoading] = useState(true);
@@ -74,6 +75,8 @@ useEffect(() => {
     userInfoUpdate,
     googleUser,
     userSignOut,
+    limit,
+    setLimit,
   };
    return (<context.Provider value={authInfo}>
     {children}

@@ -3,7 +3,7 @@ import { Navigate, useLocation } from 'react-router';
 import { useAuth } from '../Context/Auth.Context.jsx';
 import GeneralShkeleton from '../Components/GeneralSkeleton';
 
-const PrivateRoute = ({ children, allowedRoles }) => {
+const PrivateRoute = ({ children }) => {
   const { user, loading, checkSession } = useAuth();
   const location = useLocation();
 
@@ -23,10 +23,6 @@ const PrivateRoute = ({ children, allowedRoles }) => {
         replace
       />
     );
-  }
-
-  if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" replace />;
   }
 
   return children;

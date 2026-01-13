@@ -10,8 +10,7 @@ import { useEffect } from "react";
 import axios from "axios";
 
 const HomePage = () => {
-  const [limit ,setLimit] = useState(0);
-  const { user, userSignOut } = useAuth();
+  const { user, userSignOut,limit,setLimit } = useAuth();
   const [longUrl, setLongUrl] = useState("");
   const [shortenedUrl, setShortenedUrl] = useState("");
   const [isShortening, setIsShortening] = useState(false);
@@ -53,7 +52,7 @@ const HomePage = () => {
     
     try {  
         const shortCode = Math.random().toString(36).substring(7);
-      setShortenedUrl(`localhost:5200/api/v1/url/${shortCode}`);
+      setShortenedUrl(`http://localhost:5200/api/v1/url/${shortCode}`);
       const response = await axios.post(`http://localhost:5200/api/v1/update-user`, { 
         mail: user.email,
       });
@@ -77,11 +76,11 @@ const copyToClipboard = async () => {
 
   try {
     // Copy full URL including https://
-    await navigator.clipboard.writeText(`https://${shortenedUrl}`);
+    await navigator.clipboard.writeText(`${shortenedUrl}`);
     setCopied(true);
 
     // Reset copied state after 1.5s for button feedback
-    setTimeout(() => setCopied(false), 1500);
+    setTimeout(() => setCopied(false), 500);
   } catch (err) {
     console.error("Copy failed:", err);
     alert("Failed to copy. Please copy manually.");
@@ -95,12 +94,14 @@ const copyToClipboard = async () => {
         <header className="fixed top-0 backdrop-blur-sm shadow-lg flex items-center justify-between px-6 py-4  w-full z-50 ">
           <div className=" max-w-7xl mx-auto w-full flex items-center justify-between px-8">
             <div className="flex items-center gap-3">
+              <a className="flex gap-3 items-center" href="/">
               <div className="size-10 text-primary flex items-center justify-center bg-white dark:bg-surface-dark shadow-sm rounded-xl border border-slate-100 dark:border-slate-800">
                 <span className="material-symbols-outlined text-3xl">link</span>
               </div>
               <h2 className="text-xl hidden lg:block font-bold tracking-tight text-slate-900 dark:text-white">
                 ShortLinker
               </h2>
+              </a>
             </div>
 
             <nav className="hidden md:flex gap-8 text-sm font-medium text-slate-600 dark:text-slate-400">
@@ -133,9 +134,9 @@ const copyToClipboard = async () => {
                   </span> */}
                   <div className="flex items-center gap-6">
             <nav className="hidden md:flex gap-8 text-sm font-medium text-slate-500 dark:text-slate-400">
-              <a className="hover:text-slate-900 dark:text-white transition-colors" href="#">Dashboard</a>
-              <a className="hidden lg:block hover:text-slate-900 dark:hover:text-white transition-colors" href="#">Analytics</a>
-              <a className="hidden lg:block hover:text-slate-900 dark:hover:text-white transition-colors" href="#">Settings</a>
+              <Link className="hover:text-slate-900 dark:text-white transition-colors" to={'/dashboard/'+ user?.email}>Dashboard</Link>
+              <Link className="hidden lg:block hover:text-slate-900 dark:hover:text-white transition-colors" to='/'>Analytics</Link>
+              <Link className="hidden lg:block hover:text-slate-900 dark:hover:text-white transition-colors" href='/'>Settings</Link>
             </nav>
             <div className="flex items-center gap-4 pl-6 sm:border-l border-slate-200 dark:border-slate-700">
               <button
@@ -197,6 +198,8 @@ const copyToClipboard = async () => {
               performance. Join thousands of marketers creating millions of
               links each month.
             </p>
+            { user && (
+        
               <div className="flex flex-col md:flex-row items-center gap-4 bg-white dark:bg-surface-dark px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm mb-10">
                 <div className="flex md:flex-col gap-5 md:gap-0 items-center">
                   <span className="text-sm font-bold text-slate-900 dark:text-white">{100 -(limit) 
@@ -212,7 +215,9 @@ const copyToClipboard = async () => {
                 <button className="ml-2 cursor-pointer text-xs font-medium text-primary hover:text-primary-dark whitespace-nowrap">Upgrade</button></a>
               </div>
                </div>
+                   )}
 <div className="w-full max-w-2xl relative group">
+
 
           {/* FIXED overlay */}
           <div className="absolute -inset-1 bg-gradient-to-r from-blue-400 to-purple-400 
@@ -252,14 +257,14 @@ const copyToClipboard = async () => {
            <div className="mt-6 animate-in fade-in slide-in-from-top-4 duration-500 bg-white dark:bg-surface-dark rounded-xl border border-slate-100 dark:border-slate-800 p-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
       <div className="flex flex-col text-left overflow-hidden w-full">
         <span className="text-xs text-slate-500 mb-1">Your short link</span>
-        <a
+        <Link
           className="text-primary font-medium hover:underline truncate"
-          href={`http://${shortenedUrl}`}
+          to={`${shortenedUrl}`}
           target="_blank"
           rel="noreferrer"
         >
           {shortenedUrl}
-        </a>
+        </Link>
       </div>
 
               {/* FIXED BUTTON */}
