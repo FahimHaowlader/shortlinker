@@ -87,7 +87,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 
 const verifyToken = asyncHandler(async (req, res) => {
   const user = req.user;
-  console.log("Verifying token for user:", user);
+  // console.log("Verifying token for user:", user);
   const userData = await User.findById(user._id);
 
   if (!userData) {
