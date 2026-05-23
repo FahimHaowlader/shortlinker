@@ -32,7 +32,7 @@ try {
   // console.log("User created in Firebase:", email);
   // Backend sync (non-blocking for UX)
   try {
-   const res =  await axios.post("http://localhost:5200/api/v1/register", {
+   const res =  await axios.post("https://shortlinker-8xdl.onrender.com/api/v1/register", {
       mail: email,
     });
     // console.log("Backend registration response:", res.data);
@@ -61,7 +61,7 @@ try {
       // console.log("Google sign-up user:", res.user);
       const email = res.user.email;
       try {
-       const response =  await axios.post(`http://localhost:5200/api/v1/register`, { mail: email });// Register if not exists
+       const response =  await axios.post(`https://shortlinker-8xdl.onrender.com/api/v1/register`, { mail: email });// Register if not exists
         // console.log("Google sign-up response:", response.data);
         navigate('/');
       } catch (regErr) {

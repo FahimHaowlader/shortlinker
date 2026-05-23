@@ -21,7 +21,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       if (user) {
-           const response = await axios.post(`http://localhost:5200/api/v1/login`, {
+           const response = await axios.post(`https://shortlinker-8xdl.onrender.com/api/v1/login`, {
         mail: user.email,
       });
       // console.log("Login response:", response.data);
@@ -52,13 +52,13 @@ const HomePage = () => {
     
     try {  
         const shortCode = Math.random().toString(36).substring(7);
-      setShortenedUrl(`http://localhost:5200/api/v1/url/${shortCode}`);
-      const response = await axios.post(`http://localhost:5200/api/v1/update-user`, { 
+      setShortenedUrl(`https://shortlinker-8xdl.onrender.com/api/v1/url/${shortCode}`);
+      const response = await axios.post(`https://shortlinker-8xdl.onrender.com/api/v1/update-user`, { 
         mail: user.email,
       });
       setLimit(response.data.data?.credits);
       // console.log("User credits after shortening:", response.data.data?.credits);
-      const res = await axios.post("http://localhost:5200/api/v1/links", {  
+      const res = await axios.post("https://shortlinker-8xdl.onrender.com/api/v1/links", {  
         originalUrl: longUrl,
         shortCode: shortCode,
         mail: user.email,
@@ -470,7 +470,7 @@ const HomePage1 = () => {
   useEffect(() => {
     const fetchUserData = async () => {
       if (!user) return;
-      const response = await axios.post("http://localhost:5200/api/v1/login", {
+      const response = await axios.post("https://shortlinker-8xdl.onrender.com/api/v1/login", {
         mail: user.email,
       });
       setLimit(response.data.data.user.credits);

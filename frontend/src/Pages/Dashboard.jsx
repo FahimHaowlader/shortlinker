@@ -6,7 +6,7 @@ import axios from "axios";
 import { useAuth } from "../Contexts/AuthContext";
 import Pagination from "../Components/Pagination";
 
-const API = "http://localhost:5200/api/v1";
+const API = "https://shortlinker-8xdl.onrender.com/api/v1";
 
 const DashboardPage = () => {
   const navigate = useNavigate();

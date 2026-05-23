@@ -20,7 +20,7 @@ const LoginPage = () => {
 
     try {
       await emailUserSignIn(email, password);
-      const response = await axios.post(`http://localhost:5200/api/v1/login`, {
+      const response = await axios.post(`https://shortlinker-8xdl.onrender.com/api/v1/login`, {
         mail: email,
       });
       // console.log("Login response:", response.data);
@@ -53,13 +53,13 @@ const handleGoogleLogin = async () => {
 
     try {
       // Try to login user
-      const res = await axios.post("http://localhost:5200/api/v1/login", {
+      const res = await axios.post("https://shortlinker-8xdl.onrender.com/api/v1/login", {
         mail: email,
       });
     } catch (err) {
       // If user does NOT exist → create new user
       if (err.response?.status === 404) {
-          const res = await axios.post("http://localhost:5200/api/v1/register", {
+          const res = await axios.post("https://shortlinker-8xdl.onrender.com/api/v1/register", {
           mail: email,
         });
         // console.log("New user registered via Google:", res.data);
